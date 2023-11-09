@@ -3,7 +3,12 @@ function EventToday({ selectedTs }) {
         {
             'start_ts': new Date(2023, 11, 9, 9, 0, 0),
             'end_ts': new Date(2023, 11, 9, 13, 50),
-            'id': '0x13'
+            'id': '0x14',
+        },
+        {
+            'start_ts': new Date(2023, 11, 9, 17, 0, 0),
+            'end_ts': new Date(2023, 11, 9, 18, 50),
+            'id': '0x14',
         }
     ];
 
@@ -35,38 +40,33 @@ function EventToday({ selectedTs }) {
         }
     };
 
+    const formatTime = (hours, minutes) => {
+        let h = hours;
+        let m = minutes;
+        if (h < 10) h = '0' + h;
+        if (m < 10) m = '0' + m;
+        return `${h}:${m}`;
+    }
 
     return <>
         <main className="flex flex-col w-3/4 h-2/3  p-4 align-item space-y-4 border">
             <h1 className="text-5xl">{selectedTs.toDateString()}</h1>
             {eventToday.map(event => {
-                return <>
-                    <div className="flex flex-row justify-between border">
-                        <div className="flex flex-col space-y-4 p-4" key={event.id}>
-                            <div className="flex flex-row space-x-4">
-                                <p>{eventTodayDb[event.id].description}</p>
-                            </div>
-                            
-                            <div className="flex flex-row space-x-4">
-                                {/* <p>{ eventTodayDb[event.id].type? 1: 2 }</p> */}
-                                <p className="text-3xl">{eventTodayDb[event.id].name}</p>
-                            </div>
+                return (<div className="flex flex-row justify-between border" key={event.id}>
+                    <div className="flex flex-col space-y-4 p-4">
+                        <div className="flex flex-row space-x-4">
+                            <p>{eventTodayDb[event.id].description}</p>
                         </div>
-                        <div className="flex flex-col justify-center space-y-4 py-4">
-                            <div className="flex flex-row w-20">
-                                <p>{event.start_ts.getHours()}</p>
-                                :
-                                <p>{event.start_ts.getMinutes()}</p>
-                            </div>
-                            <div className="flex flex-row w-20">
-                                <p>{event.end_ts.getHours()}</p>
-                                :
-                                <p>{event.end_ts.getMinutes()}</p>
-                            </div>
+
+                        <div className="flex flex-row space-x-4">
+                            <p className="text-3xl">{eventTodayDb[event.id].name}</p>
                         </div>
                     </div>
-
-                </>;
+                    <div className="flex flex-col justify-center space-y-4 p-4">
+                        <p className="text-2xl">{formatTime(event.start_ts.getHours(), event.start_ts.getMinutes())}</p>
+                        <p className="text-2xl ">{formatTime(event.end_ts.getHours(), event.end_ts.getMinutes())}</p>
+                    </div>
+                </div>);
             })}
 
         </main>
