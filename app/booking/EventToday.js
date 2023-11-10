@@ -1,76 +1,200 @@
+import { eventToday, eventTodayDb } from "./db/TestData";
+
+
+const settings = {
+  start_ts: new Date(2023, 11, 9, 7, 0, 0),
+  end_ts: new Date(2023, 11, 9, 21, 0, 0),
+  height_ratio: 1000,
+};
+
+
+const formatTime = (hours, minutes) => {
+    let h = hours;
+    let m = minutes;
+    if (h < 10) h = "0" + h;
+    if (m < 10) m = "0" + m;
+    return `${h}:${m}`;
+  };
+
+
+function DisplayMode(props) {
+    var mode;
+  if (props.event.type == 'fake') {
+    mode = null;
+  } else if (Number(props.event.style.height.split('px')[0]) < 120) {
+    mode = 0;
+  } else if (Number(props.event.style.height.split('px')[0]) < 200) {
+    mode = 1;
+  } else {
+    mode = 2;
+  }
+
+  switch (mode) {
+    case 0:
+      return (
+        <>
+          <div className="flex flex-col justify-center">
+            <div className="flex flex-row space-x-4">
+              <p className="text-3xl">
+                {props.eventTodayDb[props.event.id].name}
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-col justify-center">
+            <p className="text-2xl">
+              {formatTime(
+                props.event.start_ts.getHours(),
+                props.event.start_ts.getMinutes()
+              )}
+            </p>
+            <p className="text-2xl ">
+              {formatTime(
+                props.event.end_ts.getHours(),
+                props.event.end_ts.getMinutes()
+              )}
+            </p>
+          </div>
+        </>
+      );
+    case 1:
+      return <>
+        <div className="flex flex-col space-y-4">
+            <div className="flex flex-row space-x-4">
+              <p>{props.eventTodayDb[props.event.id].description}</p>
+            </div>
+
+            <div className="flex flex-row space-x-4">
+              <p className="text-3xl">
+                {props.eventTodayDb[props.event.id].name}
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-col justify-center space-y-4">
+            <p className="text-2xl">
+              {formatTime(
+                props.event.start_ts.getHours(),
+                props.event.start_ts.getMinutes()
+              )}
+            </p>
+            <p className="text-2xl ">
+              {formatTime(
+                props.event.end_ts.getHours(),
+                props.event.end_ts.getMinutes()
+              )}
+            </p>
+          </div>
+      </>;
+    case 2:
+        return <>
+          <div className="flex flex-col space-y-4">
+            <div className="flex flex-row space-x-4">
+              <p>{props.eventTodayDb[props.event.id].description}</p>
+            </div>
+
+            <div className="flex flex-row space-x-4">
+              <p className="text-3xl">
+                {props.eventTodayDb[props.event.id].name}
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-col justify-center space-y-4">
+            <p className="text-2xl">
+              {formatTime(
+                props.event.start_ts.getHours(),
+                props.event.start_ts.getMinutes()
+              )}
+            </p>
+            <p className="text-2xl ">
+              {formatTime(
+                props.event.end_ts.getHours(),
+                props.event.end_ts.getMinutes()
+              )}
+            </p>
+          </div>
+        </>
+    default:
+      return <></>;
+  }
+}
+
 function EventToday({ selectedTs }) {
-    const eventToday = [
-        {
-            'start_ts': new Date(2023, 11, 9, 9, 0, 0),
-            'end_ts': new Date(2023, 11, 9, 13, 50),
-            'id': '0x14',
-        },
-        {
-            'start_ts': new Date(2023, 11, 9, 17, 0, 0),
-            'end_ts': new Date(2023, 11, 9, 18, 50),
-            'id': '0x14',
-        }
-    ];
 
-    const eventTodayDb = {
-        '0x13': {
-            name: '上午聚会',
-            description: '部门周会',
-            type: 'meeting'
-        },
-        '0x14': {
-            name: '午餐',
-            description: '公司食堂',
-            type: 'meal'
-        },
-        '0x15': {
-            name: '下午茶',
-            description: '休息15分钟',
-            type: 'break'
-        },
-        '0x16': {
-            name: '运动时间',
-            description: '健身房',
-            type: 'fitness'
-        },
-        '0x17': {
-            name: '电影之夜',
-            description: '和朋友看电影',
-            type: 'entertainment'
-        }
-    };
 
-    const formatTime = (hours, minutes) => {
-        let h = hours;
-        let m = minutes;
-        if (h < 10) h = '0' + h;
-        if (m < 10) m = '0' + m;
-        return `${h}:${m}`;
+
+
+  var renderedEventToday = [];
+  for (let i = 0; i < eventToday.length; i++) {
+    if (i == 0) {
+      var fake_item = {
+        type: "fake",
+        id: "fake",
+        className: "flex flex-row justify-between border border-red-200 hover:bg-red-200 hover:cursor-pointer",
+        style: {},
+        start_ts: settings.start_ts,
+        end_ts: eventToday[0].start_ts,
+      };
+
+      fake_item.style["height"] = `${
+        ((fake_item.end_ts - fake_item.start_ts) /
+          (settings.end_ts - settings.start_ts)) *
+        settings.height_ratio
+      }px`;
+
+      renderedEventToday.push(fake_item);
     }
 
-    return <>
-        <main className="flex flex-col w-3/4 h-2/3  p-4 align-item space-y-4 border">
-            <h1 className="text-5xl">{selectedTs.toDateString()}</h1>
-            {eventToday.map(event => {
-                return (<div className="flex flex-row justify-between border" key={event.id}>
-                    <div className="flex flex-col space-y-4 p-4">
-                        <div className="flex flex-row space-x-4">
-                            <p>{eventTodayDb[event.id].description}</p>
-                        </div>
+    var real_item = {
+      type: "event",
+      className: "flex flex-row justify-between border rounded-lg",
+      style: {},
+      ...eventToday[i],
+    };
 
-                        <div className="flex flex-row space-x-4">
-                            <p className="text-3xl">{eventTodayDb[event.id].name}</p>
-                        </div>
-                    </div>
-                    <div className="flex flex-col justify-center space-y-4 p-4">
-                        <p className="text-2xl">{formatTime(event.start_ts.getHours(), event.start_ts.getMinutes())}</p>
-                        <p className="text-2xl ">{formatTime(event.end_ts.getHours(), event.end_ts.getMinutes())}</p>
-                    </div>
-                </div>);
-            })}
+    real_item.style["height"] = `${
+      ((real_item.end_ts - real_item.start_ts) /
+        (settings.end_ts - settings.start_ts)) *
+      settings.height_ratio
+    }px`;
 
-        </main>
-    </>;
+    renderedEventToday.push(real_item);
+
+    if (eventToday[i].end_ts != settings.end_ts) {
+      var fake_item = {
+        type: "fake",
+        id: "fake",
+        className: "flex flex-row justify-between border p-4 border-red-200 hover:bg-red-300 hover:cursor-pointer",
+        style: {},
+        start_ts: eventToday[0].end_ts,
+        end_ts:
+          i == eventToday.length - 1
+            ? settings.end_ts
+            : eventToday[i + 1].start_ts,
+      };
+
+      fake_item.style["height"] = `${
+        ((fake_item.end_ts - fake_item.start_ts) /
+          (settings.end_ts - settings.start_ts)) *
+        settings.height_ratio
+      }px`;
+
+      renderedEventToday.push(fake_item);
+    }
+  }
+
+  return (
+    <>
+      <main className="flex flex-col w-96 h-5/6 px-4 align-item overflow-y-auto">
+        {/* <h1 className="text-5xl">{selectedTs.toDateString()}</h1> */}
+        {renderedEventToday.map((event, index) => {
+          return (
+            <div className={event.className} style={event.style} key={index}>
+              {<DisplayMode mode={event.type === 'fake'? null: 0} eventTodayDb={eventTodayDb} event={event} />}
+            </div>
+          );
+        })}
+      </main>
+    </>
+  );
 }
 
 export { EventToday };
