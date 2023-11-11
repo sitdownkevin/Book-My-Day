@@ -1,5 +1,8 @@
 class Event {
-    constructor({name, description, location, start_ts, end_ts}, type='event') {
+    constructor(
+        { name, description, location, start_ts, end_ts },
+        type = "event"
+    ) {
         this.name = name;
         this.description = description;
         this.location = location;
@@ -14,9 +17,7 @@ class Event {
         }
         return true;
     }
-
 }
-
 
 class EventDb {
     constructor() {
@@ -33,8 +34,7 @@ class EventDb {
         }
     }
 
-
-    delEevent(event) {}
+    delEevent(event) { }
 
     queryByStartTs(ts) {
         // 二分查找 根据start_ts获取插入的位置
@@ -68,7 +68,10 @@ class EventDb {
                 return true;
             }
         } else {
-            if (event.start_ts >= this.events[loc - 1].end_ts && event.end_ts <= this.events[loc].start_ts) {
+            if (
+                event.start_ts >= this.events[loc - 1].end_ts &&
+                event.end_ts <= this.events[loc].start_ts
+            ) {
                 return true;
             }
         }
@@ -77,28 +80,28 @@ class EventDb {
     }
 }
 
+module.exports = {
+    EventDb,
+    Event,
+};
+
+function dev() {
+    const data = [
+        { start_ts: 1, end_ts: 2 },
+        { start_ts: 2, end_ts: 3 },
+        { start_ts: 3, end_ts: 4 },
+        { start_ts: 4, end_ts: 5 },
+    ];
+    let db = new EventDb();
+    data.forEach(item => {
+        let event = new Event(item.start_ts, item.end_ts);
+        db.addEvent(event);
+    });
+    console.log(db.events);
+    console.log(db.queryByStartTs(5));
+    db.addEvent(new Event(3.1, 2));
+    console.log(db.events);
+}
 
 
-export { Event, EventDb };
-
-
-// const data = [
-//     { start_ts: 1, end_ts: 2 },
-//     { start_ts: 2, end_ts: 3 },
-//     { start_ts: 3, end_ts: 4 },
-//     { start_ts: 4, end_ts: 5 },
-// ];
-
-
-// let db = new EventDb();
-
-// data.forEach(item => {
-//     let event = new Event(item.start_ts, item.end_ts);
-//     db.addEvent(event);
-// });
-
-
-// console.log(db.events);
-// console.log(db.queryByStartTs(5));
-// db.addEvent(new Event(3.1, 2));
-// console.log(db.events);
+// dev()

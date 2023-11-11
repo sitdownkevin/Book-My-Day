@@ -1,11 +1,24 @@
-import { Event, EventDb } from "./EventObj";
-import { timeString2TimeStamp } from "./Utils";
+const { Event, EventDb } = require('./EventObj');
+const { fetchIcs, fetchLocalIcs } = require('./FetchIcs');
 
 
 
-const formatCheck = (icsTextFile) => {
+function timeString2TimeStamp(_tString) {
+    const year = parseInt(_tString.slice(0, 4), 10);
+    const month = parseInt(_tString.slice(4, 6), 10) - 1;
+    const day = parseInt(_tString.slice(6, 8), 10);
+    const hour = parseInt(_tString.slice(9, 11), 10);
+    const minute = parseInt(_tString.slice(11, 13), 10);
+    const second = parseInt(_tString.slice(13, 15), 10);
+
+    return new Date(Date.UTC(year, month, day, hour, minute, second));
+};
+
+
+function formatCheck(icsString) {
+    // Check pairs
     let stack = [];
-    icsTextFile.split("\r\n").forEach((line) => {
+    icsString.split("\r\n").forEach((line) => {
         if (line.includes("BEGIN:")) {
             stack.push(line.split(":")[1]);
         }
@@ -15,19 +28,21 @@ const formatCheck = (icsTextFile) => {
                 return false;
             }
         }
-
-        return true;
     });
+    // TODO: Check other attributes
+
+    return true;
 };
 
-const extractEventsObj = (icsTextFile) => {
-    if (formatCheck(icsTextFile) === false) {
+
+function extractEventsObj(icsString) {
+    if (formatCheck(icsString) === false) {
         return null;
     }
     let events = [];
     let event_tmp = {};
     let record = false;
-    icsTextFile.split("\r\n").forEach((line) => {
+    icsString.split("\r\n").forEach((line) => {
         if (line.includes("BEGIN:VEVENT")) {
             event_tmp["id"] = events.length;
             event_tmp["content"] = "";
@@ -37,6 +52,7 @@ const extractEventsObj = (icsTextFile) => {
             record = false;
             event_tmp = {};
         } else {
+            // Record Info for Each Event
             if (record) {
                 if (line.includes("SUMMARY")) {
                     event_tmp["name"] = line.split("SUMMARY:")[1];
@@ -54,29 +70,27 @@ const extractEventsObj = (icsTextFile) => {
             }
         }
     });
-    return events;
+
+    return events; // TODO: Rename it
 };
 
 
+async function createEventDb() {
+    const icsString = fetchLocalIcs();
+    // const icsString = await fetchIcs();
+    const events = extractEventsObj(icsString);
 
+    // console.log(events[0]);
 
-(async () => {
-    const ics_text = await fetchIcs(configs.ics_url);
-    console.log(ics_text);
+    const eventDb = new EventDb();
 
-    let eventsObj = extractEventsObj(data);
-
-
-    let _eventDb = new mE.EventDb();
-    for (let i = 0; i < eventsObj.length; i++) {
-        let item = eventsObj[i];
-
-        const regex_ts = /(\d{8}T\d{6})/; // 使用正则表达式匹配时间戳
+    events.forEach(item => {
+        // Extracr start and end ts
+        const regex_ts = /(\d{8}T\d{6})/;
         const start_ts = item.start.match(regex_ts)[1]; // 使用match方法进行匹配
         const end_ts = item.end.match(regex_ts)[1];
 
-        console.log(start_ts, end_ts);
-        let _event = new mE.Event(
+        const event = new Event(
             {
                 name: item.name,
                 description: item.description,
@@ -85,9 +99,10 @@ const extractEventsObj = (icsTextFile) => {
                 end_ts: timeString2TimeStamp(end_ts)
             }
         );
-        _eventDb.addEvent(_event);
 
-
+        eventDb.addEvent(event);
+        
+        // TODO: Rules for each item!!!
         // const regex = /([^=;]+)=([^;]+)?/g;
         // let match;
         // let result = {};
@@ -97,9 +112,14 @@ const extractEventsObj = (icsTextFile) => {
         //     const value = match[2] || true; // 如果没有值，则设为true
         //     result[key] = value;
         // }
+    })
 
-        // console.log(item.rrule)
-        // console.log(result);
-        // break;
-    }
-})();
+    return eventDb;
+}
+
+
+module.exports = {
+    createEventDb,
+}
+
+// createEventDb().then(console.log).catch(console.log)

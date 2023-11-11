@@ -1,4 +1,3 @@
-import { eventToday, eventTodayDb } from "./db/TestData";
 
 
 const settings = {
@@ -7,23 +6,21 @@ const settings = {
   height_ratio: 1000,
 };
 
-
-const formatTime = (hours, minutes) => {
-    let h = hours;
-    let m = minutes;
-    if (h < 10) h = "0" + h;
-    if (m < 10) m = "0" + m;
-    return `${h}:${m}`;
-  };
-
+function formatTime(hours, minutes) {
+  let h = hours;
+  let m = minutes;
+  if (h < 10) h = "0" + h;
+  if (m < 10) m = "0" + m;
+  return `${h}:${m}`;
+}
 
 function DisplayMode(props) {
-    var mode;
-  if (props.event.type == 'fake') {
+  var mode;
+  if (props.event.type == "fake") {
     mode = null;
-  } else if (Number(props.event.style.height.split('px')[0]) < 120) {
+  } else if (Number(props.event.style.height.split("px")[0]) < 120) {
     mode = 0;
-  } else if (Number(props.event.style.height.split('px')[0]) < 200) {
+  } else if (Number(props.event.style.height.split("px")[0]) < 200) {
     mode = 1;
   } else {
     mode = 2;
@@ -57,35 +54,8 @@ function DisplayMode(props) {
         </>
       );
     case 1:
-      return <>
-        <div className="flex flex-col space-y-4">
-            <div className="flex flex-row space-x-4">
-              <p>{props.eventTodayDb[props.event.id].description}</p>
-            </div>
-
-            <div className="flex flex-row space-x-4">
-              <p className="text-3xl">
-                {props.eventTodayDb[props.event.id].name}
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-col justify-center space-y-4">
-            <p className="text-2xl">
-              {formatTime(
-                props.event.start_ts.getHours(),
-                props.event.start_ts.getMinutes()
-              )}
-            </p>
-            <p className="text-2xl ">
-              {formatTime(
-                props.event.end_ts.getHours(),
-                props.event.end_ts.getMinutes()
-              )}
-            </p>
-          </div>
-      </>;
-    case 2:
-        return <>
+      return (
+        <>
           <div className="flex flex-col space-y-4">
             <div className="flex flex-row space-x-4">
               <p>{props.eventTodayDb[props.event.id].description}</p>
@@ -112,33 +82,60 @@ function DisplayMode(props) {
             </p>
           </div>
         </>
+      );
+    case 2:
+      return (
+        <>
+          <div className="flex flex-col space-y-4">
+            <div className="flex flex-row space-x-4">
+              <p>{props.eventTodayDb[props.event.id].description}</p>
+            </div>
+
+            <div className="flex flex-row space-x-4">
+              <p className="text-3xl">
+                {props.eventTodayDb[props.event.id].name}
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-col justify-center space-y-4">
+            <p className="text-2xl">
+              {formatTime(
+                props.event.start_ts.getHours(),
+                props.event.start_ts.getMinutes()
+              )}
+            </p>
+            <p className="text-2xl ">
+              {formatTime(
+                props.event.end_ts.getHours(),
+                props.event.end_ts.getMinutes()
+              )}
+            </p>
+          </div>
+        </>
+      );
     default:
       return <></>;
   }
 }
 
-function EventToday({ selectedTs }) {
-
-
-
-
+function EventToday({ eventToday, eventTodayDb }) {
   var renderedEventToday = [];
   for (let i = 0; i < eventToday.length; i++) {
     if (i == 0) {
       var fake_item = {
         type: "fake",
         id: "fake",
-        className: "flex flex-row justify-between border border-red-200 hover:bg-red-200 hover:cursor-pointer",
+        className:
+          "flex flex-row justify-between border border-red-200 hover:bg-red-200 hover:cursor-pointer",
         style: {},
         start_ts: settings.start_ts,
         end_ts: eventToday[0].start_ts,
       };
 
-      fake_item.style["height"] = `${
-        ((fake_item.end_ts - fake_item.start_ts) /
-          (settings.end_ts - settings.start_ts)) *
+      fake_item.style["height"] = `${((fake_item.end_ts - fake_item.start_ts) /
+        (settings.end_ts - settings.start_ts)) *
         settings.height_ratio
-      }px`;
+        }px`;
 
       renderedEventToday.push(fake_item);
     }
@@ -150,11 +147,10 @@ function EventToday({ selectedTs }) {
       ...eventToday[i],
     };
 
-    real_item.style["height"] = `${
-      ((real_item.end_ts - real_item.start_ts) /
-        (settings.end_ts - settings.start_ts)) *
+    real_item.style["height"] = `${((real_item.end_ts - real_item.start_ts) /
+      (settings.end_ts - settings.start_ts)) *
       settings.height_ratio
-    }px`;
+      }px`;
 
     renderedEventToday.push(real_item);
 
@@ -162,7 +158,8 @@ function EventToday({ selectedTs }) {
       var fake_item = {
         type: "fake",
         id: "fake",
-        className: "flex flex-row justify-between border p-4 border-red-200 hover:bg-red-300 hover:cursor-pointer",
+        className:
+          "flex flex-row justify-between border p-4 border-red-200 hover:bg-red-300 hover:cursor-pointer",
         style: {},
         start_ts: eventToday[0].end_ts,
         end_ts:
@@ -171,11 +168,10 @@ function EventToday({ selectedTs }) {
             : eventToday[i + 1].start_ts,
       };
 
-      fake_item.style["height"] = `${
-        ((fake_item.end_ts - fake_item.start_ts) /
-          (settings.end_ts - settings.start_ts)) *
+      fake_item.style["height"] = `${((fake_item.end_ts - fake_item.start_ts) /
+        (settings.end_ts - settings.start_ts)) *
         settings.height_ratio
-      }px`;
+        }px`;
 
       renderedEventToday.push(fake_item);
     }
@@ -188,7 +184,12 @@ function EventToday({ selectedTs }) {
         {renderedEventToday.map((event, index) => {
           return (
             <div className={event.className} style={event.style} key={index}>
-              {<DisplayMode mode={event.type === 'fake'? null: 0} eventTodayDb={eventTodayDb} event={event} />}
+              {
+                <DisplayMode
+                  eventTodayDb={eventTodayDb}
+                  event={event}
+                />
+              }
             </div>
           );
         })}

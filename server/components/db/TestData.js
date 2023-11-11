@@ -5,11 +5,6 @@ const eventToday = [
     id: "0x14",
   },
   {
-    start_ts: new Date(2023, 11, 9, 11, 0, 0),
-    end_ts: new Date(2023, 11, 9, 12, 0),
-    id: "0x15",
-  },
-  {
     start_ts: new Date(2023, 11, 9, 12, 0, 5),
     end_ts: new Date(2023, 11, 9, 13, 0),
     id: "0x17",
@@ -22,18 +17,13 @@ const eventToday = [
 ];
 
 const eventTodayDb = {
-  "0x13": {
-    name: "上午聚会",
-    description: "部门周会",
-    type: "meeting",
-  },
   "0x14": {
-    name: "午餐",
+    name: "吃必胜客",
     description: "公司食堂",
     type: "meal",
   },
   "0x15": {
-    name: "下午茶",
+    name: "吃肯德基",
     description: "休息15分钟",
     type: "break",
   },
@@ -50,4 +40,7 @@ const eventTodayDb = {
 };
 
 
-export default {  eventToday, eventTodayDb }
+module.exports = {
+  eventToday, 
+  eventTodayDb,
+}
