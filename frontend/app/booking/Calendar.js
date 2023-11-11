@@ -2,25 +2,38 @@
 
 import { useState, useEffect } from "react";
 
+let count = 0;
+
+function generateUUID() {
+    count += 1;
+    return count;
+}
+
+
 function Month({ _month, setMonth, setIsMonthOpen }) {
     const months = Array.from(
         { length: 12 },
-        (_, i) => ({ id: i, val: 1 + i })
+        (_, i) => ({ id: generateUUID(), val: i })
     );
 
+    const handleClick = (idx) => {
+        setMonth(idx);
+        setIsMonthOpen(false);
+    }
+
     return <>
-        <div className="origin-top-right rounded shadow ">
-            <div className="bg-white max-h-48 overflow-y-auto">
-                {months.map(month => {
+        <div className="origin-top-right rounded shadow bg-white">
+            <div className="max-h-48 overflow-y-auto">
+                {months.map((month) => {
                     return <>
-                        <a className={`block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white ${month.val === _month ? 'bg-indigo-500 text-white' : ''}`} key={month.id}
+                        <li className={`block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white ${month.id === _month ? 'bg-indigo-500 text-white' : ''}`}
+                            key={month.id}
                             onClick={() => {
-                                setMonth(month.val);
-                                setIsMonthOpen(false);
+                                handleClick(month.val);
                             }}
                         >
-                            {month.val}
-                        </a>
+                            {month.val + 1}
+                        </li>
                     </>
                 })}
             </div>
@@ -32,23 +45,27 @@ function Month({ _month, setMonth, setIsMonthOpen }) {
 function Year({ _year, setYear, setIsYearOpen }) {
     const years = Array.from(
         { length: 6 },
-        (_, i) => ({ id: i, val: 2018 + i })
+        (_, i) => ({ id: generateUUID(), val: 2018 + i })
     );
 
+    const handleClick = (idx) => {
+        setYear(idx);
+        setIsYearOpen(false);
+    }
 
     return <>
-        <div className="origin-top-right rounded shadow">
-            <div className="bg-white max-h-48 overflow-y-auto">
+        <div className="origin-top-right rounded shadow bg-white">
+            <div className="max-h-48 overflow-y-auto">
                 {years.map(year => {
                     return <>
-                        <a className={`block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white ${year.val === _year ? 'bg-indigo-500 text-white' : ''}`} key={year.id}
+                        <div className={`block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white ${year.val === _year ? 'bg-indigo-500 text-white' : ''}`}
+                            key={year.id}
                             onClick={() => {
-                                setYear(year.val);
-                                setIsYearOpen(false);
+                                handleClick(year.val);
                             }}
                         >
                             {year.val}
-                        </a>
+                        </div>
                     </>
                 })}
             </div>
@@ -57,15 +74,25 @@ function Year({ _year, setYear, setIsYearOpen }) {
 }
 
 
-function Menu({ year, setYear, month, setMonth }) {
+function Menu({ year, setYear, month, setMonth, date, setDate }) {
     const [isYearOpen, setIsYearOpen] = useState(false);
     const [isMonthOpen, setIsMonthOpen] = useState(false);
 
+    const isToday = () => {
+        return ((new Date(Date.now())).getDate() === date) && ((new Date(Date.now())).getMonth() === month) && ((new Date(Date.now())).getFullYear() === year);
+    }
+
+    useEffect(() => {
+        setIsYearOpen(false);
+        setIsMonthOpen(false);
+    }, [month, year, date]);
+
+
     return <>
-        <div className="bg-white w-70 h-8 flex flex-row">
+
             <div className="relative flex flex-col w-24">
                 <button
-                    className="inline-flex items-center px-4 py-2 text-gray-500 bg-white rounded hover:bg-gray-100"
+                    className="inline-flex items-center px-4 py-2 text-gray-500 rounded hover:bg-gray-100"
                     onClick={() => { setIsYearOpen(!isYearOpen); setIsMonthOpen(false); }}
                 >
                     {year}
@@ -73,15 +100,15 @@ function Menu({ year, setYear, month, setMonth }) {
                         <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
                 </button>
-                {isYearOpen && <Year _year={year} setYear={setYear} setIsYearOpen={setIsYearOpen}/>}
+                {isYearOpen && <Year _year={year} setYear={setYear} setIsYearOpen={setIsYearOpen} />}
             </div>
 
             <div className="relative flex flex-col w-20">
                 <button
-                    className="inline-flex items-center px-4 py-2 text-gray-500 bg-white rounded hover:bg-gray-100"
+                    className="inline-flex items-center px-4 py-2 text-gray-500 rounded hover:bg-gray-100"
                     onClick={() => { setIsMonthOpen(!isMonthOpen); setIsYearOpen(false); }}
                 >
-                    {month}
+                    {month + 1}
                     <svg className="w-4 h-4 ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
@@ -89,13 +116,20 @@ function Menu({ year, setYear, month, setMonth }) {
                 {isMonthOpen && <Month _month={month} setMonth={setMonth} setIsMonthOpen={setIsMonthOpen} />}
             </div>
 
-        </div>
+            <div className="relative flex flex-col w-20">
+                <button
+                    className={`inline-flex items-center px-4 py-2 rounded hover:bg-blue-200 ${isToday() ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-500'}`}
+                    onClick={() => { setIsMonthOpen(false); setIsYearOpen(false); setYear((new Date(Date.now())).getFullYear()); setMonth((new Date(Date.now()).getMonth())); setDate((new Date(Date.now())).getDate()); }}
+                >
+                    Today
+                </button>
+            </div>
     </>;
 }
 
 
-function Panel({ days, start_day, selected, setSelected }) {
-    const which_days = [
+function Panel({ year, month, date, setDate }) {
+    const label_days = [
         { 'id': 1, 'name': 'S' },
         { 'id': 2, 'name': 'M' },
         { 'id': 3, 'name': 'T' },
@@ -105,70 +139,65 @@ function Panel({ days, start_day, selected, setSelected }) {
         { 'id': 7, 'name': 'S' }
     ]
 
-    const before_days = Array.from(
-        { length: start_day },
-        (_, i) => ({ id: i, name: 'before' })
+    const fake_days = Array.from(
+        { length: (new Date(year, month, 1, 0, 0, 0)).getDay() },
+        (_, i) => ({ id: generateUUID(), name: 'before' })
     )
 
+    const entity_days = Array.from(
+        { length: (new Date(year, month, 0)).getDate() },
+        (_, i) => ({ id: generateUUID(), name: i + 1 })
+    )
+
+    const handleClick = (id) => {
+        setDate(id);
+    }
+
     return <>
-        <div className="bg-white grid grid-cols-7">
-            {which_days.map(day => {
-                return <div className="w-10 h-10 flex justify-center items-center font-serif font-bold" 
-                            key={day.id}
-                        >
-                            {day.name}
-                        </div>
-            })}
-            {before_days.map(day => {
-                return <div className="w-10 h-10 flex justify-center items-center" key={day.id}></div>
-            })}
-            {days.map(day => {
-                return <div
-                    className={`w-10 h-10 flex justify-center items-center rounded-full
+            <div className="grid grid-cols-7">
+                {label_days.map(day => {
+                    return <div className="w-10 h-10 flex justify-center items-center font-serif font-bold"
+                        key={day.id}
+                    >
+                        {day.name}
+                    </div>
+                })}
+                {fake_days.map(day => {
+                    return <div className="w-10 h-10 flex justify-center items-center" key={day.id}></div>
+                })}
+                {entity_days.map(day => {
+                    return <div
+                        className={`w-10 h-10 flex justify-center items-center rounded-full
                         hover:cursor-pointer hover:bg-blue-200 hover:text-white
-                        ${day.id === selected ? 'bg-blue-400 border-2 border-blue-500 text-white' : ''}`}
-                    key={day.id}
-                    onClick={() => { setSelected(day.id); }}
-                >
-                    <span className="font-sans">{day.name}</span>
-                </div>
-            })}
-        </div>
+                        ${day.name === date ? 'bg-blue-400 border-2 border-blue-500 text-white' : ''}`}
+                        key={day.id}
+                        onClick={() => { handleClick(day.name); }}
+                    >
+                        <span className="font-sans">{day.name}</span>
+                    </div>
+                })}
+            </div>
     </>
 }
 
 
-function Calendar({selectedTs, setSelectedTs}) {
-    const daysInMonth = function(year, month) {
-        const date = new Date(year, month, 0);
-        return date.getDate();
-    }
-    
-    const [year, setYear] = useState(selectedTs.getFullYear());
-    const [month, setMonth] = useState(selectedTs.getMonth() + 1);
-    const [selected, setSelected] = useState(selectedTs.getDate());
-
-    const [startTs, setStartTs] = useState(new Date(year, month - 1, 1));
-    const [days, setDays] = useState(Array.from(
-        { length: daysInMonth(year, month) },
-        (_, i) => ({ id: i+1, name: i+1 })
-    ));
+function Calendar({ selectedTs, setSelectedTs }) {
+    const [year, setYear] = useState((new Date(selectedTs)).getFullYear());
+    const [month, setMonth] = useState((new Date(selectedTs).getMonth()));
+    const [date, setDate] = useState((new Date(selectedTs)).getDate());
 
     useEffect(() => {
-        setStartTs(new Date(year, month - 1, 1));
-        setDays(Array.from(
-            { length: daysInMonth(year, month) },
-            (_, i) => ({ id: i+1, name: i+1 })
-        ));
-        setSelectedTs(new Date(year, month - 1, selected));
-    }, [year, month, setSelectedTs, selected]);
-
+        setSelectedTs((new Date(year, month, date)).getTime());
+        console.log(selectedTs);
+    }, [year, month, date]);
 
     return <>
-        <main className="bg-black">
-            <Menu year={year} setYear={setYear} month={month} setMonth={setMonth} />
-            <Panel days={days} start_day={startTs.getDay()} selected={selected} setSelected={setSelected} />
-        </main>
+            <div className="top-0 left-1/2 -translate-x-1/2 absolute flex flex-row z-10 h-6 w-72">
+                <Menu year={year} setYear={setYear} month={month} setMonth={setMonth} date={date} setDate={setDate} />
+            </div>
+            <div className="top-10 left-1/2 -translate-x-1/2 absolute w-72">
+                <Panel year={year} month={month} date={date} setDate={setDate} />
+            </div>
     </>
 }
 

@@ -118,7 +118,7 @@ function DisplayMode(props) {
   }
 }
 
-function EventToday({ eventToday, eventTodayDb }) {
+function EventToday({ eventToday, eventTodayDb, selectedTs }) {
   var renderedEventToday = [];
   for (let i = 0; i < eventToday.length; i++) {
     if (i == 0) {
@@ -180,7 +180,7 @@ function EventToday({ eventToday, eventTodayDb }) {
   return (
     <>
       <main className="flex flex-col w-96 h-5/6 px-4 align-item overflow-y-auto">
-        {/* <h1 className="text-5xl">{selectedTs.toDateString()}</h1> */}
+        <h1 className="text-5xl">{(new Date(selectedTs)).toDateString()}</h1>
         {renderedEventToday.map((event, index) => {
           return (
             <div className={event.className} style={event.style} key={index}>
