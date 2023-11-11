@@ -30,3 +30,14 @@ app.get('/api/test/today_events', (req, res) => {
 
     res.json(data);
 })
+
+app.post('/api/test/today_events', async (req, res) => {
+    const { selectedTs } = req.body;
+
+    const { createEventDb } = require('./components/HandleIcs')
+    const eventDb = await createEventDb();
+    const { get_today_events_from_eventDb } =  require('./apis/TodayEvents')
+    const data = get_today_events_from_eventDb(eventDb, selectedTs);
+
+    res.json(data);
+})
