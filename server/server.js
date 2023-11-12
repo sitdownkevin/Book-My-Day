@@ -1,5 +1,9 @@
+
+
 const express = require('express');
+const bodyParser = require('body-parser');
 const app = express();
+app.use(bodyParser.json());
 app.listen(3001, () => {
     console.log(`Server is running on port 3001`);
 });
@@ -20,24 +24,27 @@ app.get('/', (req, res) => {
 
 
 // APIs
-
-app.get('/api/test/today_events', (req, res) => {
-    const { eventToday, eventTodayDb } = require('./components/db/TestData');
-    const data = {
-        eventToday,
-        eventTodayDb
-    }
-
-    res.json(data);
-})
-
+const { get_todayEvents_and_todayEventsDb_from_eventDb } =  require('./apis/TodayEvents');
+const { createEventDb } = require('./components/HandleIcs')
 app.post('/api/test/today_events', async (req, res) => {
-    const { selectedTs } = req.body;
-
-    const { createEventDb } = require('./components/HandleIcs')
+    let selectedTs;
     const eventDb = await createEventDb();
-    const { get_today_events_from_eventDb } =  require('./apis/TodayEvents')
-    const data = get_today_events_from_eventDb(eventDb, selectedTs);
+    if (typeof req.body !== 'undefined' && typeof req.body.selectedTs === 'string') {
+        selectedTs = parseInt(req.body.selectedTs);
+        selectedTs = 1697817600000;
+        const data = await get_todayEvents_and_todayEventsDb_from_eventDb(eventDb, selectedTs)
+                            .then(data => data)
+                            .catch(console.log);
 
-    res.json(data);
+        res.json({
+            condition: 'success',
+            eventToday: data.todayEvents,
+            eventTodayDb: data.todayEventsDb,
+            date: (new Date(selectedTs)).toUTCString()
+        })
+    } else {
+        res.json({
+            condition: 'fail'
+        })
+    }
 })

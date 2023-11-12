@@ -2,7 +2,6 @@ const { Event, EventDb } = require('./EventObj');
 const { fetchIcs, fetchLocalIcs } = require('./FetchIcs');
 
 
-
 function timeString2TimeStamp(_tString) {
     const year = parseInt(_tString.slice(0, 4), 10);
     const month = parseInt(_tString.slice(4, 6), 10) - 1;

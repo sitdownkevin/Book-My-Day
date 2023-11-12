@@ -6,8 +6,8 @@ class Event {
         this.name = name;
         this.description = description;
         this.location = location;
-        this.start_ts = start_ts;
-        this.end_ts = end_ts;
+        this.start_ts = start_ts.getTime();
+        this.end_ts = start_ts.getTime();
         this.type = type;
     }
 

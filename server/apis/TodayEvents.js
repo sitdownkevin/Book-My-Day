@@ -1,48 +1,48 @@
-const { createEventDb } = require('../components/HandleIcs')
+// async function main() {
+//     const { createEventDb } = require('../components/HandleIcs')
+//     const eventDb = await createEventDb();
+//     const selectedTs = (new Date(2023, 9, 21, 0, 0, 0)).getTime();
+
+//     const todayEvents = await get_todayEvents_and_todayEventsDb_from_eventDb(eventDb, selectedTs)
+//                             .then(data => data);
+//     console.log(todayEvents);
+// }
 
 
-async function main() {
-    const eventDb = await createEventDb();
-    const selectedTs = new Date(2023, 9, 21, 0, 0, 0);
-
-    const todayEvents = get_today_events_from_eventDb(eventDb, selectedTs);
-    console.log(todayEvents);
-}
-
-
-function get_today_events_from_eventDb(eventDb, selectedTs) {
+async function get_todayEvents_and_todayEventsDb_from_eventDb(eventDb, selectedTs=1697817600000) {
     todayEvents = [];
     todayEventsDb = [];
 
     const start_loc = eventDb.queryByStartTs(selectedTs);
-    const end_loc = eventDb.queryByStartTs(new Date(selectedTs.getYear(), selectedTs.getMonth(), selectedTs.getDate() + 1, 0, 0, 0));
+    const end_loc = eventDb.queryByStartTs(selectedTs + 86400000);
     
-    console.log(start_loc, end_loc);
+    // console.log(selectedTs, selectedTs + 86400000);
+    // console.log(start_loc, end_loc);
 
-    new Date().getSecond
-    for (let i=start_loc; i<end_loc; i++) {
-        const event = eventDb.events[i];
-        todayEvents.push({
-            start_ts: event.start_ts,
-            end_ts: event.end_ts,
-            id: i
-        });
-
-        todayEventsDb.push({
-            id: i,
-            name: event.name,
-            description: event.description,
-        })
+    if (end_loc === 0 || start_loc === eventDb.events.length) {
+        return { todayEvents, todayEventsDb };
+    } else {
+        for (let i=start_loc; i<end_loc; i++) {
+            const event = eventDb.events[i];
+            todayEvents.push({
+                start_ts: event.start_ts,
+                end_ts: event.end_ts,
+                id: i
+            });
+    
+            todayEventsDb.push({
+                id: i,
+                name: event.name,
+                description: event.description,
+            })
+        }
+        return { todayEvents, todayEventsDb };
     }
-
-    return {
-        todayEvents,
-        todayEventsDb
-    };
 }
 
-main();
+
+// main();
 
 module.exports = {
-    get_today_events_from_eventDb
+    get_todayEvents_and_todayEventsDb_from_eventDb
 }
