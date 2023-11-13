@@ -1,11 +1,15 @@
+/**
+ * 后续想用db替代
+ */
+
 class Event {
     constructor(
-        { name, description, location, start_ts, end_ts },
+        name, description, location, start_ts, end_ts,
         type = "event"
     ) {
-        this.name = name;
-        this.description = description;
-        this.location = location;
+        this.name = typeof name !== 'undefined'? name: 'Null';
+        this.description = typeof description !== 'undefined'? description: 'Null';
+        this.location = typeof name != 'undefined'? location: 'Null';
         this.start_ts = start_ts;
         this.end_ts = end_ts;
         this.type = type;
@@ -80,28 +84,31 @@ class EventDb {
     }
 }
 
+
 module.exports = {
-    EventDb,
     Event,
+    EventDb
 };
 
-function dev() {
-    const data = [
-        { start_ts: 1, end_ts: 2 },
-        { start_ts: 2, end_ts: 3 },
-        { start_ts: 3, end_ts: 4 },
-        { start_ts: 4, end_ts: 5 },
-    ];
-    let db = new EventDb();
-    data.forEach(item => {
-        let event = new Event(item.start_ts, item.end_ts);
-        db.addEvent(event);
-    });
-    console.log(db.events);
-    console.log(db.queryByStartTs(5));
-    db.addEvent(new Event(3.1, 2));
-    console.log(db.events);
-}
+
+
+// function dev() {
+//     const data = [
+//         { start_ts: 1, end_ts: 2 },
+//         { start_ts: 2, end_ts: 3 },
+//         { start_ts: 3, end_ts: 4 },
+//         { start_ts: 4, end_ts: 5 },
+//     ];
+//     let db = new EventDb();
+//     data.forEach(item => {
+//         let event = new Event(item.start_ts, item.end_ts);
+//         db.addEvent(event);
+//     });
+//     console.log(db.events);
+//     console.log(db.queryByStartTs(5));
+//     db.addEvent(new Event(3.1, 2));
+//     console.log(db.events);
+// }
 
 
 // dev()
