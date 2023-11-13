@@ -24,6 +24,7 @@ async function get_todayEvents_and_todayEventsDb_from_eventDb(eventDb, selectedT
     } else {
         for (let i=start_loc; i<end_loc; i++) {
             const event = eventDb.events[i];
+            console.log(event);
             todayEvents.push({
                 start_ts: event.start_ts,
                 end_ts: event.end_ts,
