@@ -129,6 +129,10 @@ function Menu({ year, setYear, month, setMonth, date, setDate }) {
 
 
 function Panel({ year, month, date, setDate }) {
+    const isMonthYearCorrect = () => {
+        return ((new Date(Date.now())).getMonth() === month) && ((new Date(Date.now())).getFullYear() === year);
+    }
+
     const label_days = [
         { 'id': 1, 'name': 'S' },
         { 'id': 2, 'name': 'M' },
@@ -167,9 +171,13 @@ function Panel({ year, month, date, setDate }) {
                 })}
                 {entity_days.map(day => {
                     return <div
-                        className={`w-10 h-10 flex justify-center items-center rounded-full
-                        hover:cursor-pointer hover:bg-blue-200 hover:text-white
-                        ${day.name === date ? 'bg-blue-400 border-2 border-blue-500 text-white' : ''}`}
+                        className={
+                            `w-10 h-10 flex justify-center items-center rounded-full
+                            hover:cursor-pointer hover:bg-blue-200 hover:text-white
+                            ${ isMonthYearCorrect() && day.name === (new Date(Date.now())).getDate()? 'border-2 border-red-500': ''}
+                            ${day.name === date ? 'bg-blue-400 border-2 border-blue-500 text-white ' : ''}
+                            `
+                        }
                         key={day.id}
                         onClick={() => { handleClick(day.name); }}
                     >
@@ -188,7 +196,7 @@ function Calendar({ selectedTs, setSelectedTs }) {
 
     useEffect(() => {
         setSelectedTs((new Date(year, month, date)).getTime());
-        console.log(selectedTs);
+        // console.log(selectedTs);
     }, [year, month, date]);
 
     return <>
