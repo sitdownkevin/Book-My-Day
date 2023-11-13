@@ -6,14 +6,14 @@ import { EventToday } from "./EventToday";
 import { useState, useRef, useEffect } from "react";
 
 import td from "./db/TestData";
+import { stringify } from "postcss";
 
 
 function Bmd() {
     const now = new Date(Date.now());
     const [selectedTs, setSelectedTs] = useState((new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0)).getTime());
-    // const [data, setData] = useState('null-data');
-    const [eventToday, setEventToday] = useState(td.eventToday);
-    const [eventTodayDb, setEventTodayDb] = useState(td.eventTodayDb);
+    const [eventToday, setEventToday] = useState([]);
+    const [eventTodayDb, setEventTodayDb] = useState([]);
 
 
     const fetchEventToday = (selectedTs) => {
@@ -29,23 +29,15 @@ function Bmd() {
             .then(res => res.json())
             .then(data => {
                 if (data.condition === 'success') {
-                    let _eventToday = data.eventToday;
-                    let _eventTodayDb = data.eventTodayDb;
+                    const _eventToday = [];
+                    const _eventTodayDb = [];
+
     
-                    for (let i=0; i<_eventToday.length; i++) {
-                        _eventToday[i].start_ts = new Date(_eventToday[i].start_ts);
-                        _eventToday[i].end_ts = new Date(_eventToday[i].end_ts);
-                        // console.log(_eventToday[i]);
-                    }
-    
-                    for (let i=0; i<_eventTodayDb.length; i++) {
-                        _eventTodayDb[i].start_ts = new Date(_eventTodayDb[i].start_ts);
-                        _eventTodayDb[i].end_ts = new Date(_eventTodayDb[i].end_ts);
-                    }
-    
-                    setEventToday(_eventToday);
-                    setEventTodayDb(_eventTodayDb);
-                    // console.log(eventToday, eventTodayDb);
+                    setEventToday(data.eventToday);
+                    setEventTodayDb(data.eventTodayDb);
+                    // console.log(eventToday);
+                    // console.log('---')
+                    // console.log(eventTodayDb);
                 } else {
                     console.log(data.condition);
                 }

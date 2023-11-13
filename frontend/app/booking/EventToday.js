@@ -1,5 +1,3 @@
-
-
 const settings = {
   start_ts: new Date(2023, 11, 9, 7, 0, 0),
   end_ts: new Date(2023, 11, 9, 21, 0, 0),
@@ -33,7 +31,7 @@ function DisplayMode(props) {
           <div className="flex flex-col justify-center">
             <div className="flex flex-row space-x-4">
               <p className="text-3xl">
-                {props.eventTodayDb[props.event.id].name}
+                {props.eventTodayDb[props.index].name}
               </p>
             </div>
           </div>
@@ -58,12 +56,12 @@ function DisplayMode(props) {
         <>
           <div className="flex flex-col space-y-4">
             <div className="flex flex-row space-x-4">
-              <p>{props.eventTodayDb[props.event.id].description}</p>
+              <p>{props.eventTodayDb[props.index].description}</p>
             </div>
 
             <div className="flex flex-row space-x-4">
               <p className="text-3xl">
-                {props.eventTodayDb[props.event.id].name}
+                {props.eventTodayDb[props.index].name}
               </p>
             </div>
           </div>
@@ -88,12 +86,12 @@ function DisplayMode(props) {
         <>
           <div className="flex flex-col space-y-4">
             <div className="flex flex-row space-x-4">
-              <p>{props.eventTodayDb[props.event.id].description}</p>
+              <p>{props.eventTodayDb[props.index].description}</p>
             </div>
 
             <div className="flex flex-row space-x-4">
               <p className="text-3xl">
-                {props.eventTodayDb[props.event.id].name}
+                {props.eventTodayDb[props.index].name}
               </p>
             </div>
           </div>
@@ -133,7 +131,7 @@ function EventToday({ eventToday, eventTodayDb, selectedTs }) {
       };
 
       fake_item.style["height"] = `${((fake_item.end_ts - fake_item.start_ts) /
-        (settings.end_ts - settings.start_ts)) *
+          (settings.end_ts - settings.start_ts)) *
         settings.height_ratio
         }px`;
 
@@ -148,7 +146,7 @@ function EventToday({ eventToday, eventTodayDb, selectedTs }) {
     };
 
     real_item.style["height"] = `${((real_item.end_ts - real_item.start_ts) /
-      (settings.end_ts - settings.start_ts)) *
+        (settings.end_ts - settings.start_ts)) *
       settings.height_ratio
       }px`;
 
@@ -169,7 +167,7 @@ function EventToday({ eventToday, eventTodayDb, selectedTs }) {
       };
 
       fake_item.style["height"] = `${((fake_item.end_ts - fake_item.start_ts) /
-        (settings.end_ts - settings.start_ts)) *
+          (settings.end_ts - settings.start_ts)) *
         settings.height_ratio
         }px`;
 
@@ -180,16 +178,11 @@ function EventToday({ eventToday, eventTodayDb, selectedTs }) {
   return (
     <>
       <main className="flex flex-col w-96 h-5/6 px-4 align-item overflow-y-auto">
-        <h1 className="text-5xl">{(new Date(selectedTs)).toDateString()}</h1>
+        <h1 className="text-5xl">{new Date(selectedTs).toDateString()}</h1>
         {renderedEventToday.map((event, index) => {
           return (
             <div className={event.className} style={event.style} key={index}>
-              {
-                <DisplayMode
-                  eventTodayDb={eventTodayDb}
-                  event={event}
-                />
-              }
+              {<DisplayMode eventTodayDb={eventTodayDb} event={event} index={index} />}
             </div>
           );
         })}

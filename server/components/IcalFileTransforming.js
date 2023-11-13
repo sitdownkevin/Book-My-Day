@@ -1,6 +1,6 @@
 const { fetchIcalFile, loadIcalFile } = require('./IcalFileLoading');
 
-const { Event, EventDb } = require('./EventClass');
+const { PreEvent, Event, EventsDb } = require('./EventClass');
 
 
 /**
@@ -8,7 +8,7 @@ const { Event, EventDb } = require('./EventClass');
  * import ical data into Database
 */
 function formatCheck(icalFileString) {
-    // Check pairs
+    /**  Check Pairs  */
     let stack = [];
     icalFileString.split("\r\n").forEach((line) => {
         if (line.includes("BEGIN:")) {
@@ -21,84 +21,59 @@ function formatCheck(icalFileString) {
             }
         }
     });
-    // TODO: Check other attributes
+
+    /** TODO: Others */
 
     return true;
 };
 
 
 
-// TODO:
-function event2Events(event) {
-    const _event = new Event({
-        name: event.name,
-        description: event.description,
-        location: event.location,
-        start_ts: 1,
-        end_ts: 2,
-    })
-
-    return [ _event ];
-}
-
-
-// TODO:
 function buildDbFromIcalFileString(icalFileString) {
     if (formatCheck(icalFileString) === false) {
         return undefined;
     }
+    const eventsDb = new EventsDb();
 
-    const eventDb = new EventDb();
-
-    let event = {
-        name: null,
-        description: null,
-        rrule: null,
-        location: null,
-        start: null,
-        end: null,
-    };
-    let recordFlag = false;
+    let preEvent;
+    let recordFlag;
     icalFileString.split("\r\n").forEach((line) => {
         if (line.includes("BEGIN:VEVENT")) {
+            preEvent = new PreEvent();
             recordFlag = true;
         } else if (line.includes("END:VEVENT")) {
-            // deal with original event
-            event2Events(event).forEach(event => {
-                eventDb.addEvent(new Event());
-            });
+            // console.log(preEvent);
+            preEvent.generateAfterEvents().forEach(item => {
+                eventsDb.addEvent(item);
+            })
             recordFlag = false;
-            event = {
-                name: null,
-                description: null,
-                rrule: null,
-                location: null,
-                start: null,
-                end: null,
-            };
         } else {
             if (recordFlag) {
                 if (line.includes("SUMMARY")) {
-                    event["name"] = line.split("SUMMARY:")[1];
+                    preEvent.name = line.split("SUMMARY:")[1];
                 } else if (line.includes("DESCRIPTION")) {
-                    event["description"] = line.split("DESCRIPTION:")[1];
+                    preEvent.description = line.split("DESCRIPTION:")[1];
                 } else if (line.includes("RRULE:")) {
-                    event["rrule"] = line.split("RRULE:")[1];
+                    // console.log(line);
+                    preEvent.rrule = line.split("RRULE:")[1];
                 } else if (line.includes("DTSTART")) {
-                    event["start"] = line.split("DTSTART")[1];
+                    preEvent.start_ts = line.split("DTSTART")[1];
                 } else if (line.includes("DTEND")) {
-                    event["end"] = line.split("DTEND")[1];
+                    preEvent.end_ts = line.split("DTEND")[1];
                 } else if (line.includes("LOCATION")) {
-                    event["location"] = line.split("LOCATION:")[1];
+                    preEvent.location = line.split("LOCATION:")[1];
                 }
             }
         }
     });
+    
 
-    return eventDb;
+    return eventsDb;
 };
 
-
+module.exports = {
+    buildDbFromIcalFileString
+}
 
 /**
  * Db => JSON
@@ -106,16 +81,17 @@ function buildDbFromIcalFileString(icalFileString) {
 
 
 
-
-
 async function dev() {
     const path = require('path');
-    icalFileString = await loadIcalFile(path.join(__dirname, './db/calendar.ics'))
-        .then(data => data);
+    // icalFileString = await loadIcalFile(path.join(__dirname, './db/calendar.ics'))
+    //     .then(data => data);
     
-    const eventDb = buildDbFromIcalFileString(icalFileString);
+    icalFileString = await fetchIcalFile('https://outlook.live.com/owa/calendar/00000000-0000-0000-0000-000000000000/00f9f87a-5664-449f-a166-8ed0efe08756/cid-CBD0172F236B818C/calendar.ics')
+        .then(data => data);
 
-    console.log(eventDb.events);
+    // const eventDb = buildDbFromIcalFileString(icalFileString);
+    const eventsDb = buildDbFromIcalFileString(icalFileString);
+    console.log(eventsDb.events);
 }
 
-dev();
+// dev();
